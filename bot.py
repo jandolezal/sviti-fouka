@@ -25,7 +25,7 @@ if __name__ == '__main__':
         solar = str(solar['value']).replace('.', ',')
         wind = str(wind['value']).replace('.', ',')
 
-        tweet = f"🌬️ {wind} MWh\n☀️ {solar}MWh\n...během uplynulé hodiny\n\n🚋{tram} km"
+        tweet = f"🌬️ {wind} MWh\n☀️ {solar} MWh\n...během uplynulé hodiny\n\n= 🚋 ujede {tram} km (2,82 kWh/km)"
         print(tweet)
         api.update_status(status=tweet)
         sleep(3600)
