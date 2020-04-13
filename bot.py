@@ -6,8 +6,11 @@ from ceps import get_energy_for_now
 
 def tram_equivalent(*args):
     tram_eqv = int(round(sum(args)/2.82*1000, 0))
-    tram_eqv = str(tram_eqv).replace('.', ',')
-    return tram_eqv
+    tram_eqv = list(str(tram_eqv).replace('.', ','))
+    for i in range(1,len(tram_eqv)):
+        if i % 3 == 0:
+            tram_eqv.insert(i, ' ')
+    return ''.join(tram_eqv)
 
 if __name__ == '__main__':
     # Twitter app authentication
@@ -25,7 +28,7 @@ if __name__ == '__main__':
         solar = str(solar['value']).replace('.', ',')
         wind = str(wind['value']).replace('.', ',')
 
-        tweet = f"🌬️ {wind} MWh\n☀️ {solar} MWh\n...během uplynulé hodiny\n\n= 🚋 ujede {tram} km (2,82 kWh/km)"
+        tweet = f"🌬️ {wind} MWh\n☀️ {solar} MWh\nběhem uplynulé hodiny.\n\nOdpovídá spotřebě jedné 🚋 při jízdě dlouhé {tram} km (2,82 kWh/km)."
         print(tweet)
         api.update_status(status=tweet)
         sleep(3600)
