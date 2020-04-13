@@ -1,3 +1,4 @@
+from time import sleep
 import tweepy
 from credentials import consumer_key, consumer_secret,\
     access_token, access_token_secret
@@ -9,20 +10,21 @@ def tram_equivalent(*args):
     return tram_eqv
 
 if __name__ == '__main__':
-    under_construction = True
+    # Twitter app authentication
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
     api = tweepy.API(auth)
     
-    if not under_construction:
+    while True:
+        # Get energy generation data from CEPS
         solar = get_energy_for_now('FVE')
         wind = get_energy_for_now('VTE')
-    solar = {'value': '500.0'}
-    wind = {'value': '250.0'}
-    
-    tram = tram_equivalent(float(wind['value']), float(solar['value']))
-    solar = str(solar['value']).replace('.', ',')
-    wind = str(wind['value']).replace('.', ',')
+        
+        # Prepare strings for the tweet
+        tram = tram_equivalent(float(wind['value']), float(solar['value']))
+        solar = str(solar['value']).replace('.', ',')
+        wind = str(wind['value']).replace('.', ',')
 
-    tweet = f"🌬️ {wind} MWh\n☀️ {solar} MWh\n\n🚋{tram} km"
-    api.update_status(status=tweet)
+        tweet = f"🌬️ {wind} MWh\n☀️ {solar}MWh\n...během uplynulé hodiny\n\n🚋{tram} km"
+        sleep(3600)
+        api.update_status(status=tweet)
