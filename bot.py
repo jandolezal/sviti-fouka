@@ -26,5 +26,6 @@ if __name__ == '__main__':
         wind = str(wind['value']).replace('.', ',')
 
         tweet = f"🌬️ {wind} MWh\n☀️ {solar}MWh\n...během uplynulé hodiny\n\n🚋{tram} km"
-        sleep(3600)
+        print(tweet)
         api.update_status(status=tweet)
+        sleep(3600)
