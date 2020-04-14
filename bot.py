@@ -6,11 +6,8 @@ from ceps import get_energy_for_now
 
 def tram_equivalent(*args):
     tram_eqv = int(round(sum(args)/2.82*1000, 0))
-    tram_eqv = list(str(tram_eqv).replace('.', ','))
-    for i in range(1,len(tram_eqv)):
-        if i % 3 == 0:
-            tram_eqv.insert(i, ' ')
-    return ''.join(tram_eqv)
+    tram_eqv = str(tram_eqv).replace('.', ',')
+    return tram_eqv
 
 if __name__ == '__main__':
     # Twitter app authentication
