@@ -5,11 +5,6 @@ import xmltodict
 import requests
 from credentials import token
 
-# tree = ET.parse('test.xml')
-# root = tree.getroot()
-# for child in root[10][7][2:]:
-#     print(child[0].text, child[1].text)
-
 def add_past_hour_to_params(params):
     """Add PeriodStart and  PeriodEnd to params.
     """
@@ -31,6 +26,7 @@ def add_source_to_params(res_type, params):
 
 def get_energy(url, params):
     """Get energy data based on params.
+    Returns string with a value in MWh.
     """
     r = requests.get(url, params=params)
     root = ET.fromstring(r.text)
@@ -38,11 +34,13 @@ def get_energy(url, params):
     return energy
 
 def get_past_hour_energy(res, default_params):
+    """Get energy generation from resource (res) in last hour.
+    Returns string with a value in MWh.
+    """
     params = add_past_hour_to_params(default_params)
     params = add_source_to_params(res_type[res], params)
     biomass = get_energy(production_url, params)
     return biomass
-
 
 res_type = {'Biomass': 'B01', 'Hydro Run-of-river and poundage': 'B11',\
             'Other renewable': 'B15', 'Solar': 'B16', 'Wind Onshore': 'B19'}
