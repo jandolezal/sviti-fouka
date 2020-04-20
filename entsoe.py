@@ -9,13 +9,11 @@ def add_past_hour_to_params(params):
     """Add PeriodStart and  PeriodEnd to params.
     """
     now = datetime.datetime.utcnow()
-    year = now.year
-    month = str(now.month).zfill(2)
-    day = str(now.day).zfill(2)
-    last_hour = str(now.hour-1).zfill(2)
-    hour = str(now.hour).zfill(2)
-    params['PeriodStart'] = f'{year}{month}{day}{last_hour}00'
-    params['PeriodEnd'] = f'{year}{month}{day}{hour}00'
+    today = now.date().isoformat().replace('-', '')
+    last_hour = (now - datetime.timedelta(hours=1)).hour
+    current_hour = now.hour
+    params['PeriodStart'] = f'{today}{last_hour}00'
+    params['PeriodEnd'] = f'{today}{current_hour}00'
     return params
 
 def add_source_to_params(res_type, params):
