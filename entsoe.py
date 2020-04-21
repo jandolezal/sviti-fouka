@@ -10,8 +10,8 @@ def add_past_hour_to_params(params):
     """
     now = datetime.datetime.utcnow()
     today = now.date().isoformat().replace('-', '')
-    last_hour = (now - datetime.timedelta(hours=1)).hour
-    current_hour = now.hour
+    last_hour = str((now - datetime.timedelta(hours=1)).hour).zfill(2)
+    current_hour = str(now.hour).zfill(2)
     params['PeriodStart'] = f'{today}{last_hour}00'
     params['PeriodEnd'] = f'{today}{current_hour}00'
     return params
