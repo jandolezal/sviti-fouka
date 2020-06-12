@@ -11,15 +11,18 @@ if __name__ == '__main__':
     auth.set_access_token(access_token, access_token_secret)
     api = tweepy.API(auth)
     
-    # Get energy generation data from entsoe
-    solar = get_past_hour_energy('Solar', default_params)
-    wind = get_past_hour_energy('Wind Onshore', default_params)
-    biomass = get_past_hour_energy('Biomass', default_params)
-    water = get_past_hour_energy('Hydro Run-of-river and poundage', default_params)
+    # Tweet generation data from entsoe unless past hour is missing
+    try:
+        solar = get_past_hour_energy('Solar', default_params)
+        wind = get_past_hour_energy('Wind Onshore', default_params)
+        biomass = get_past_hour_energy('Biomass', default_params)
+        water = get_past_hour_energy('Hydro Run-of-river and poundage', default_params)
 
-    tweet = f"🌬️ {wind} MWh\n" + \
-            f"☀️ {solar} MWh\n" + \
-            f"🌿 {biomass} MWh\n" + \
-            f"💧 {water} MWh\n" + \
-            "obnovitelné ⚡ během uplynulé hodiny"
-    api.update_status(status=tweet)
+        tweet = f"🌬️ {wind} MWh\n" + \
+                f"☀️ {solar} MWh\n" + \
+                f"🌿 {biomass} MWh\n" + \
+                f"💧 {water} MWh\n" + \
+                "obnovitelné ⚡ během uplynulé hodiny"
+        api.update_status(status=tweet)
+    except IndexError:
+        pass

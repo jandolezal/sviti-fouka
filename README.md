@@ -4,4 +4,4 @@
 
 Vybrané obnovitelné zdroje (biomasa, slunce, vítr, část vodní) ze statistiky Aggregated Generation per Type (16.1.B&C).
 
-Záminka pro seznámení se s Tweepy a PythonAnywhere.
+Záminka pro seznámení se s Tweepy a Raspberry Pi.

@@ -1,7 +1,5 @@
-
 import xml.etree.ElementTree as ET
 import datetime
-import xmltodict
 import requests
 from credentials import token
 
@@ -37,13 +35,24 @@ def get_past_hour_energy(res, default_params):
     """
     params = add_past_hour_to_params(default_params)
     params = add_source_to_params(res_type[res], params)
-    biomass = get_energy(production_url, params)
-    return biomass
+    energy = get_energy(production_url, params)
+    return energy
 
-res_type = {'Biomass': 'B01', 'Hydro Run-of-river and poundage': 'B11',\
-            'Other renewable': 'B15', 'Solar': 'B16', 'Wind Onshore': 'B19'}
+res_type = {
+    'Biomass': 'B01',
+    'Hydro Run-of-river and poundage': 'B11',
+    'Other renewable': 'B15',
+    'Solar': 'B16',
+    'Wind Onshore': 'B19',
+    }
 
 production_url = 'https://transparency.entsoe.eu/api?'
 
-default_params = {'securityToken': token, 'In_Domain': '10YCZ-CEPS-----N',\
-    'ProcessType': 'A16', 'DocumentType': 'A75','PeriodStart': '', 'PeriodEnd': ''}
+default_params = {
+    'securityToken': token,
+    'In_Domain': '10YCZ-CEPS-----N',
+    'ProcessType': 'A16',
+    'DocumentType': 'A75',
+    'PeriodStart': '',
+    'PeriodEnd': '',
+    }
