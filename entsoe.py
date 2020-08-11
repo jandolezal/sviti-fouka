@@ -1,58 +1,36 @@
-import xml.etree.ElementTree as ET
-import datetime
 import requests
-from credentials import token
+import xmltodict
 
-def add_past_hour_to_params(params):
-    """Add PeriodStart and  PeriodEnd to params.
-    """
-    now = datetime.datetime.utcnow()
-    today = now.date().isoformat().replace('-', '')
-    last_hour = str((now - datetime.timedelta(hours=1)).hour).zfill(2)
-    current_hour = str(now.hour).zfill(2)
-    params['PeriodStart'] = f'{today}{last_hour}00'
-    params['PeriodEnd'] = f'{today}{current_hour}00'
-    return params
-
-def add_source_to_params(res_type, params):
-    """Add PsrType (power source type) to params.
-    """
-    params['PsrType'] = res_type
-    return params
-
-def get_energy(url, params):
+def get_renewable_energy(url, params, res_map):
     """Get energy data based on params.
-    Returns string with a value in MWh.
+    Returns dictionary with energy from renewable sources.
     """
+    energy = {}
     r = requests.get(url, params=params)
-    root = ET.fromstring(r.text)
-    energy = root[10][7][2][1].text
+    if r.status_code != 200:
+        return None
+    d = xmltodict.parse(r.text)
+    for serie in d['GL_MarketDocument']['TimeSeries']:
+        psr_type = serie['MktPSRType']['psrType']
+        quantity = serie['Period']['Point']['quantity']
+        if psr_type in res_map:
+            energy[res_map[psr_type]] = quantity
     return energy
 
-def get_past_hour_energy(res, default_params):
-    """Get energy generation from resource (res) in last hour.
-    Returns string with a value in MWh.
-    """
-    params = add_past_hour_to_params(default_params)
-    params = add_source_to_params(res_type[res], params)
-    energy = get_energy(production_url, params)
-    return energy
+url = 'https://transparency.entsoe.eu/api?'
 
-res_type = {
-    'Biomass': 'B01',
-    'Hydro Run-of-river and poundage': 'B11',
-    'Other renewable': 'B15',
-    'Solar': 'B16',
-    'Wind Onshore': 'B19',
-    }
-
-production_url = 'https://transparency.entsoe.eu/api?'
-
-default_params = {
-    'securityToken': token,
+params = {
+    'securityToken': None,
     'In_Domain': '10YCZ-CEPS-----N',
     'ProcessType': 'A16',
     'DocumentType': 'A75',
-    'PeriodStart': '',
-    'PeriodEnd': '',
+    'TimeInterval': None,
+    }
+
+res_map = {
+    'B01': 'Biomass',
+    'B11': 'Hydro Run-of-river and poundage',
+    'B15': 'Other renewable',
+    'B16': 'Solar',
+    'B19': 'Wind Onshore',
     }

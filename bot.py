@@ -1,28 +1,38 @@
+import os
+import datetime
+from entsoe import get_renewable_energy, url, params, res_map
+from dotenv import load_dotenv
 import tweepy
-from credentials import consumer_key, consumer_secret,\
-    access_token, access_token_secret
-from ceps import get_energy_for_now
-from entsoe import get_past_hour_energy, default_params
-
 
 if __name__ == '__main__':
+    load_dotenv()
+
+    # Get energy from past hour. Script will be a cron job run at HH:05
+    start = (datetime.datetime.utcnow() - datetime.timedelta(hours=1)).isoformat(timespec='hours')
+    end = datetime.datetime.utcnow().isoformat(timespec='hours')
+    past_hour = start + '%2F' + end
+
+    # Update params to make a Entsoe API request
+    params['securityToken'] = os.getenv('ENTSOE_TOKEN')
+    params['TimeInterval'] = past_hour
+
+    #Get energy for past hour from Entsoe API
+    energy = get_renewable_energy(url, params, res_map)
+
     # Twitter app authentication
+    consumer_key = os.getenv('CONSUMER_KEY')
+    consumer_secret = os.getenv('CONSUMER_SECRET')
+    access_token = os.getenv('ACCESS_TOKEN')
+    access_token_secret = os.getenv('ACCESS_TOKEN_SECRET')
+    
     auth = tweepy.OAuthHandler(consumer_key, consumer_secret)
     auth.set_access_token(access_token, access_token_secret)
     api = tweepy.API(auth)
     
-    # Tweet generation data from entsoe unless past hour is missing
-    try:
-        solar = get_past_hour_energy('Solar', default_params)
-        wind = get_past_hour_energy('Wind Onshore', default_params)
-        biomass = get_past_hour_energy('Biomass', default_params)
-        water = get_past_hour_energy('Hydro Run-of-river and poundage', default_params)
-
-        tweet = f"🌬️ {wind} MWh\n" + \
-                f"☀️ {solar} MWh\n" + \
-                f"🌿 {biomass} MWh\n" + \
-                f"💧 {water} MWh\n" + \
-                "obnovitelné ⚡ během uplynulé hodiny"
-        api.update_status(status=tweet)
-    except IndexError:
-        pass
+    # Tweet the data
+    tweet = f"🌬️ {energy['Wind Onshore']} MWh\n" + \
+            f"☀️ {energy['Solar']} MWh\n" + \
+            f"🌿 {energy['Biomass']} MWh\n" + \
+            f"💧 {energy['Hydro Run-of-river and poundage']} MWh\n" + \
+            "obnovitelné ⚡ během uplynulé hodiny"
+    api.update_status(status=tweet)
