@@ -1,21 +1,45 @@
 import requests
+import xml.etree.ElementTree as ET
 import xmltodict
 
-def get_renewable_energy(url, params, res_map):
-    """Get energy data based on params.
-    Returns dictionary with energy from renewable sources.
-    """
-    energy = {}
+def request_data(url, params):
     r = requests.get(url, params=params)
     if r.status_code != 200:
         return None
-    d = xmltodict.parse(r.text)
+    return r.text
+
+def parse_xml(xml, res_map):
+    """Parses renewable energy from xml string.
+    """
+    energy = {}
+    root = ET.fromstring(xml)
+    ns = '{urn:iec62325.351:tc57wg16:451-6:generationloaddocument:3:0}'
+    for serie in root.iter(ns + 'TimeSeries'):
+        psr_type = serie.find(ns + 'MktPSRType').find(ns+ 'psrType').text
+        quantity = serie.find(ns + 'Period').find(ns + 'Point').find(ns + 'quantity').text
+        if psr_type in res_map:
+                energy[res_map[psr_type]] = quantity
+    return energy
+
+def parse_xml_as_dict(xml, res_map):
+    """Parses renewable energy from xml string.
+    """
+    energy = {}
+    d = xmltodict.parse(xml)
     for serie in d['GL_MarketDocument']['TimeSeries']:
         psr_type = serie['MktPSRType']['psrType']
         quantity = serie['Period']['Point']['quantity']
         if psr_type in res_map:
             energy[res_map[psr_type]] = quantity
     return energy
+
+def data_check(energy):
+    for entry in energy.values():
+        try:
+            int(entry)
+        except (TypeError, ValueError):
+            return False
+    return True
 
 url = 'https://transparency.entsoe.eu/api?'
 
