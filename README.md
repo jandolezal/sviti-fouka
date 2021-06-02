@@ -6,6 +6,6 @@
 
 Vybrané obnovitelné zdroje (biomasa, slunce, vítr, část vodní) ze statistiky Aggregated Generation per Type (16.1.B&C).
 
-Běží jako cronjob 10 7-18 * * *
+Běží jako GitHub Action po nastavení přístupů k Twitter a Entsoe API pro repozitář.
 
-Záminka pro seznámení se s Tweepy, Twitter a Endsoe API.
+Záminka pro seznámení se s Tweepy, Twitter a Entsoe API.
